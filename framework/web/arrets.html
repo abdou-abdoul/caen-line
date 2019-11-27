@@ -1,0 +1,134 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>XML/NodeJS framework - Arrets</title>
+  <link type="text/css" href="css/style.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="css/semantic.css">
+</head>
+
+<body>
+  <header>
+    <div id="div-menu" class="ui inverted segment">
+      <div class="ui inverted secondary menu">
+        <a id="title" class="item">
+          Caen-Line
+        </a>
+        <div id="menu" class="right menu"></div>
+      </div>
+    </div>
+  </header>
+  <section id="content">
+    </div>
+  </section>
+  <footer>
+  </footer>
+  <script src="script/global.js"></script>
+  <script src="script/d3/d3.v3.4.11.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  //-----------------------------------------
+  function insertArret(root) {
+    let arrets = {}
+    let id = 0
+    for (let line of root) {
+      for (arret of line.arrets) {
+        if (arrets[arret]) {
+          arrets[arret].line.push(line.name)
+        } else {
+          arrets[arret] = { 'name': arret, 'line': [line.name], 'id': id }
+          id++
+        }
+      }
+    }
+    arrets = Object.values(arrets)
+    console.log("arrets", arrets);
+    var insert = d3.selectAll("#content").selectAll(".d3-content");
+    var arrData = insert.data(arrets).enter();
+    arrData.append("div")
+      .attr("id", function (d) { return "box" + d.id })
+      .attr("class", "box")
+      .on('mouseover.tooltip', function (d) {
+        d3.select('#box' + d.id)
+          .style('background', '#F0F8FF')
+          .style('opacity', '1');
+        d3.select('#lineId-' + d.id)
+          .style('opacity', '1');
+      })
+      .on('mouseout.tooltip', function (d) {
+        d3.select('#box' + d.id)
+          .style('background', 'none')
+        d3.select('#lineId-' + d.id)
+          .style('opacity', '0');
+      })
+      .append('div')
+      .attr('class', 'ui button boxb')
+      .attr('data-tooltip', function (d) {
+        lignes = d.line.length > 1 ? ' lignes' : ' ligne'
+        return "L'arrêt " + d.name + " est desservie par " + d.line.length + lignes;
+      })
+      .append("div")
+      .attr("class", "line-name")
+      // .attr("id", function (d) { return "lineId-" + d.code; })
+      .text(function (d) {
+        return d.name;
+      });
+
+    d3.selectAll('.line-name')
+      .append('text')
+      .attr('class', 'name-rollover')
+      .attr("id", function (d) { return "lineId-" + d.id; })
+      .style('opacity', '0');
+
+    d3.selectAll('.boxb')
+      .append('div')
+      .style("width", function (d) {
+        return (d.line.length * 4) + "em";
+      })
+      .style("min-width", function (d) {
+        return (5) + "em";
+      })
+      .attr("class", "line-attribute")
+      .style('border-radius', '5px')
+      .text(function (d) {
+        if (d.line.length > 1) {
+          return d.line.length + " lignes";
+        }
+        return d.line.length + " ligne";
+      });
+
+    // arrets.sort()
+    // let insert = d3.select("#d3-content").selectAll("div");
+    // let itemArret = insert.data(arrets).enter();
+    // itemArret.append("div")
+    //   .attr("class", "box")
+    //   .append("div")
+    //   .text(function (d) {
+    //     return d.name;
+    //   });
+  }
+
+  d3.json("json/menu.json", insertMenu);
+  // d3.json("json/graph.json", insertArret);
+
+  // --------------------------------------------------------------------------------
+  // socket io
+  // -------------------------------------------------------------------------------
+  var serverUrl = "http://127.0.0.1";
+  var serverPort = 8080;
+  var server = io.connect(serverUrl + ":" + serverPort);
+
+  server.on('ready', function (data) {
+    document.getElementById('menu').innerHTML += 'received from the server:' + data + '<br/>';
+  });
+
+  server.on('twistoLine', function (data) {
+    console.log('arrets', data);
+    insertArret(data);
+  });
+
+  server.emit('twistoLine');
+  </script>
+</body>
+
+</html>

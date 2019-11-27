@@ -1,0 +1,24 @@
+{ "items": [ 
+        {
+            "name": "index",
+            "label": "Accueil"
+        },
+        {
+            "name": "lignes",
+            "label": "Lignes"
+        },
+        {
+            "name": "arrets",
+            "label": "Arrets"
+        },
+        {
+            "name": "histogramme",
+            "label": "Histogramme"
+        },
+        {
+            "name": "nuage",
+            "label": "Nuage des arrets"
+        }
+
+    ]
+}

@@ -1,0 +1,153 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>XML/NodeJS framework - Index</title>
+  <link type="text/css" href="css/style.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="css/semantic.css">
+</head>
+
+<body>
+  <header>
+    <div id="div-menu" class="ui inverted segment">
+      <div class="ui inverted secondary menu">
+        <a id="title" class="item">
+          Caen-Line
+        </a>
+        <div id="menu" class="right menu"></div>
+      </div>
+    </div>
+  </header>
+  <section id="content">
+
+    <div id="listDetail">
+      <div class="detail">
+      </div>
+    </div>
+
+    <div id="d3-content"></div>
+  </section>
+  <footer>
+  </footer>
+  <script src="script/global.js"></script>
+  <script src="script/d3/d3.v3.4.11.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+  // ---------------------------------------------------
+  // Fonctions
+  // ---------------------------------------------------
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function insertTwistoLines(root) {
+    console.log("root", root);
+    root = shuffle(root)
+    var insert = d3.selectAll("#content").selectAll(".d3-content");
+    var arrData = insert.data(root).enter();
+    arrData.append("div")
+      .attr("id", function (d) { return "box" + d.code })
+      .attr("class", "box")
+      .on('mouseover.tooltip', function (d) {
+        d3.select('#box' + d.code)
+          .style('background', '#F0F8FF')
+          .style('opacity', '1');
+        d3.select('#lineId-' + d.code)
+          .style('opacity', '1');
+      })
+      .on('mouseout.tooltip', function (d) {
+        d3.select('#box' + d.code)
+          .style('background', 'none')
+        d3.select('#lineId-' + d.code)
+          .style('opacity', '0');
+      })
+      .on('click.tooltip', function (d) {
+        let liste = ""
+        for( i in d.arrets) {
+          nb = parseInt(i) + 1
+          console.log(nb)
+         liste += nb + ". "+" " + d.arrets[i] + "\n" }
+        alert(liste)
+      })
+      .append('div')
+      .attr('class', 'ui button boxb')
+      .attr('data-tooltip',function (d) { return d.name +" contient " + d.arrets.length + " arrets"; })
+      .append("div")
+      .attr("class", "line-name")
+      // .attr("id", function (d) { return "lineId-" + d.code; })
+
+      .text(function (d) {
+        return d.name;
+      });
+
+    // d3.selectAll('.box')
+    //   .append('div')
+    //   .attr('class', 'ui button')
+    //   .attr('data-tooltip',"Add users to your feed")
+
+    d3.selectAll('.line-name')
+      .append('text')
+      .attr('class', 'name-rollover')
+      .attr("id", function (d) { return "lineId-" + d.code; })
+      .style('opacity', '0')
+
+    d3.selectAll('.boxb')
+      .append('div')
+      .style("width", function (d) {
+        return (d.arrets.length / 1.2) + "em";
+      })
+      .style("min-width", function (d) {
+        return (5) + "em";
+      })
+      .attr("class", "line-attribute")
+
+      .style('border-radius', '5px')
+      .text(function (d) {
+        return d.arrets.length + " arrets";
+      });
+  }
+
+
+  function insertMenu(root) {
+    "use strict";
+    console.log("root", root);
+    console.log("items", root);
+    var insert = d3.select("#menu").selectAll("a");
+    var menu = insert.data(root.items).enter();
+    menu.append("a")
+      .attr("class", "ui item")
+      .attr("href", function (d) {
+        return d.name + ".html";
+      })
+      .text(function (d) { //d3.min.js
+        return d.label
+      });
+  }
+
+  d3.json("json/menu.json", insertMenu)
+  // d3.json("json/graph.json", insertAuthorNames)
+  // -------------------------------------------------------------------------------
+  // socket io
+  // -------------------------------------------------------------------------------
+  var serverUrl = "http://127.0.0.1";
+  var serverPort = 8080;
+  var server = io.connect(serverUrl + ":" + serverPort);
+
+  server.on('ready', function (data) {
+    document.getElementById('menu').innerHTML += 'received from the server:' + data + '<br/>';
+  });
+
+  server.on('twistoLine', function (data) {
+    console.log('lines', data);
+    insertTwistoLines(data);
+  });
+
+  server.emit('twistoLine');
+  </script>
+</body>
+
+</html>
