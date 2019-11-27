@@ -1,18 +1,18 @@
 # Caen-Line
-Application sur la visualisation de donnée des lignes de transports à Caen
-l'application est combiné :
-- d'une base de donnée non traditionnelle fournissant du json
-- d'un serveur nodejs avec socket.io pour servir les données
-- d'une visualisation de données générée côté client avec D3.js
+Application sur la visualisation de donnÃ©e des lignes de transports Ã  Caen
+l'application est combinÃ© :
+- d'une base de donnÃ©e non traditionnelle fournissant du json
+- d'un serveur nodejs avec socket.io pour servir les donnÃ©es
+- d'une visualisation de donnÃ©es gÃ©nÃ©rÃ©e cÃ´tÃ© client avec D3.js
 
-# Vidéo
+# VidÃ©o
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/WRVSQk1M_RE/0.jpg)](https://www.youtube.com/watch?v=WRVSQk1M_RE)
 
 # Lancement
-- Instaler un serveur mongodb en local. ( si différent de localhost, modifier son adresse dans le fichier framework/server.js )
+- Instaler un serveur mongodb ( si diffÃ©rent de localhost, modifier son adresse dans le fichier framework/server.js )
 - creer une base dbMongo et une table twistoLine
 - Importer crawler/twisto.json dans twistoLine
-- Installer les dépendances de l'application avec la commande : npm install
+- Installer les dÃ©pendances de l'application avec la commande : npm install
 - Lancer le serveur avec la commande : node framework/server.js
 
 # Auteur
